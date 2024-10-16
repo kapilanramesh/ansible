@@ -1,0 +1,13 @@
+---
+- name: Create a new user
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Add a new user
+      user:
+        name: myuser
+        password: "{{ 'password' | password_hash('sha512') }}"
+        shell: /bin/bash
+        state: present
+        groups: sudo
