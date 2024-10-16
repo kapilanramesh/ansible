@@ -1,0 +1,39 @@
+---
+- name: Install and configure Apache2
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Install Apache2
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+
+    - name: Ensure Apache2 is running
+      systemd:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Copy Apache2 configuration file
+      template:
+        src: /path/to/your/apache2.conf.j2
+        dest: /etc/apache2/apache2.conf
+        mode: 0644
+
+    - name: Enable mod_rewrite (if needed)
+      command: a2enmod rewrite
+      notify:
+        - Restart Apache2
+
+    - name: Ensure firewall allows Apache
+      ufw:
+        rule: allow
+        name: "Apache Full"
+
+  handlers:
+    - name: Restart Apache2
+      systemd:
+        name: apache2
+        state: restarted
